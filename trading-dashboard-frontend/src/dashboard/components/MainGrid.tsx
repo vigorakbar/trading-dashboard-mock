@@ -113,7 +113,7 @@ export default function MainGrid() {
         </Grid>
         <Grid size={12} sx={{ position: "relative" }}>
           <LoadingIndicator isPending={isPending} />
-          <CandlestickChart symbol={selectedSymbol} />
+          <CandlestickChart symbol={selectedSymbol} isPending={isPending} />
         </Grid>
       </Grid>
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>

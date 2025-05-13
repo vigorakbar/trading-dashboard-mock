@@ -1,13 +1,5 @@
 import { useEffect, useRef } from 'react';
-
-
-type Price = {
-  last: number;
-  bid: number;
-  ask: number;
-  change: number;
-  percentChange: number;
-}
+import { Price } from '../types/types';
 
 interface TickerUpdate {
   symbol: string;

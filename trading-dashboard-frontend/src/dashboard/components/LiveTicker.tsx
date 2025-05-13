@@ -3,9 +3,9 @@ import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { useState } from "react";
 import { useTickerStream } from "../hooks/useTickerStream";
-
+import { Price } from "../types/types";
 export const LiveTicker = (props: { symbol: string; isPending: boolean }) => {
-  const [price, setPrice] = useState({ last: 0, bid: 0, ask: 0, change: 0, percentChange: 0 });
+  const [price, setPrice] = useState<Price>({ last: 0, bid: 0, ask: 0, change: 0, percentChange: 0 });
 
   useTickerStream(props.symbol, props.isPending, (updates) => {
     setPrice(updates[0].price);
