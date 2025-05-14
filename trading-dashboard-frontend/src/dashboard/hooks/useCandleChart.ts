@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Candle } from '../types/types';
-import { useHistoricalAndLiveCandles, useLiveCandles } from './useHistoricalAndLiveCandles';
-import Highcharts, { Options } from 'highcharts/highstock'
-
+import { useCallback, useEffect, useState } from "react";
+import { Candle } from "../types/types";
+import {
+  useHistoricalAndLiveCandles,
+  useLiveCandles,
+} from "./useHistoricalAndLiveCandles";
+import Highcharts, { Options } from "highcharts/highstock";
 
 interface CandleUpdate {
   symbol: string;
@@ -23,30 +25,31 @@ interface UseCandleChartProps {
 export function useCandleChart({
   symbol,
   isPending = false,
-  series
+  series,
 }: UseCandleChartProps) {
-
-  const handleLiveUpdate = useCallback((update: CandleUpdate) => {
-    if (!series) return;
-    // @ts-ignore
-    const data = series.options.data as Candle[],
-      newPoint = update.candle,
-      lastPoint = data[data.length - 1];
-    if (lastPoint[0] !== newPoint[0]) {
-      series.addPoint(newPoint);
-    } else {
-      // Existing point, update it
+  const handleLiveUpdate = useCallback(
+    (update: CandleUpdate) => {
+      if (!series) return;
       // @ts-ignore
-      series.options.data[data.length - 1] = newPoint;
+      const data = series.options.data as Candle[],
+        newPoint = update.candle,
+        lastPoint = data[data.length - 1];
+      if (lastPoint[0] !== newPoint[0]) {
+        series.addPoint(newPoint);
+      } else {
+        // Existing point, update it
+        // @ts-ignore
+        series.options.data[data.length - 1] = newPoint;
 
-      series.setData(data);
-    }
-  }, [series]);
+        series.setData(data);
+      }
+    },
+    [series]
+  );
 
   useLiveCandles({
     symbol,
     isPending,
     onLiveUpdate: handleLiveUpdate,
   });
-
 }

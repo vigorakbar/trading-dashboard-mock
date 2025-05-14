@@ -1,10 +1,10 @@
 // server.js
 
-const WebSocket = require('ws');
-const http = require('http');
-const url = require('url');
+const WebSocket = require("ws");
+const http = require("http");
+const url = require("url");
 
-process.env.TZ = 'Asia/Singapore';
+process.env.TZ = "Asia/Singapore";
 
 // Create an HTTP server
 const server = http.createServer();
@@ -12,21 +12,45 @@ const wss = new WebSocket.Server({ server });
 
 // Common symbols and base prices
 const symbols = [
-  "AAPL", "MSFT", "NVDA", "META", "GOOGL",
-  "AMZN", "TSLA", "NFLX", "AMD", "INTC",
-  "BTCUSD", "ETHUSD", "SPY", "QQQ", "VOO"
+  "AAPL",
+  "MSFT",
+  "NVDA",
+  "META",
+  "GOOGL",
+  "AMZN",
+  "TSLA",
+  "NFLX",
+  "AMD",
+  "INTC",
+  "BTCUSD",
+  "ETHUSD",
+  "SPY",
+  "QQQ",
+  "VOO",
 ];
 
 const basePrices = {
-  AAPL: 180, MSFT: 350, NVDA: 700, META: 450, GOOGL: 160,
-  AMZN: 180, TSLA: 250, NFLX: 600, AMD: 150, INTC: 40,
-  BTCUSD: 40000, ETHUSD: 2500, SPY: 500, QQQ: 430, VOO: 450
+  AAPL: 180,
+  MSFT: 350,
+  NVDA: 700,
+  META: 450,
+  GOOGL: 160,
+  AMZN: 180,
+  TSLA: 250,
+  NFLX: 600,
+  AMD: 150,
+  INTC: 40,
+  BTCUSD: 40000,
+  ETHUSD: 2500,
+  SPY: 500,
+  QQQ: 430,
+  VOO: 450,
 };
 
 // Configuration for different asset types
 const CANDLE_CONFIG = {
   // Crypto - high volatility, fast updates
-  crypto: { volatility: 0.018, intervalMs: 250 },    // 4 updates/sec
+  crypto: { volatility: 0.018, intervalMs: 250 }, // 4 updates/sec
 
   // High-growth tech - medium-high volatility
   growthTech: { volatility: 0.012, intervalMs: 500 }, // 2 updates/sec
@@ -38,9 +62,9 @@ const CANDLE_CONFIG = {
   semiconductors: { volatility: 0.01, intervalMs: 750 }, // ~1.3 updates/sec
 
   // ETFs - low volatility
-  etf: { volatility: 0.003, intervalMs: 2000 },      // 0.5 updates/sec
+  etf: { volatility: 0.003, intervalMs: 2000 }, // 0.5 updates/sec
 
-  points: 1000 // Number of candles to generate
+  points: 1000, // Number of candles to generate
 };
 
 // Symbol categorization
@@ -49,7 +73,7 @@ const symbolCategories = {
   growthTech: ["NVDA", "TSLA", "META"],
   largeTech: ["AAPL", "MSFT", "GOOGL", "AMZN", "NFLX"],
   semiconductors: ["AMD", "INTC"],
-  etf: ["SPY", "QQQ", "VOO"]
+  etf: ["SPY", "QQQ", "VOO"],
 };
 
 // Get category for a symbol
@@ -79,7 +103,10 @@ function generateCandles(basePrice, volatility, points, intervalMs) {
     currentPrice += change;
 
     // Ensure price stays within reasonable bounds
-    currentPrice = Math.max(basePrice * 0.85, Math.min(basePrice * 1.15, currentPrice));
+    currentPrice = Math.max(
+      basePrice * 0.85,
+      Math.min(basePrice * 1.15, currentPrice)
+    );
 
     const high = open + Math.abs(change) * (1 + Math.random() * 0.5);
     const low = open - Math.abs(change) * (1 + Math.random() * 0.5);
@@ -90,7 +117,7 @@ function generateCandles(basePrice, volatility, points, intervalMs) {
       parseFloat(open.toFixed(2)),
       parseFloat(Math.max(open, close, high).toFixed(2)),
       parseFloat(Math.min(open, close, low).toFixed(2)),
-      parseFloat(close.toFixed(2))
+      parseFloat(close.toFixed(2)),
     ]);
   }
 
@@ -127,9 +154,10 @@ function getInitialCandles(symbol) {
 
     // Store the latest candle for continued trend generation
     latestCandles[symbol] = {
-      close: initialCandlesCache[symbol][initialCandlesCache[symbol].length - 1][4],
+      close:
+        initialCandlesCache[symbol][initialCandlesCache[symbol].length - 1][4],
       category,
-      volatilityMultiplier
+      volatilityMultiplier,
     };
   }
 
@@ -164,19 +192,19 @@ function getNextCandle(symbol) {
   close = Math.max(basePrice * 0.85, Math.min(basePrice * 1.15, close));
 
   // Create high and low with appropriate ranges based on volatility
-  const high = Math.max(open, close) + (Math.random() * maxChange);
-  const low = Math.min(open, close) - (Math.random() * maxChange);
+  const high = Math.max(open, close) + Math.random() * maxChange;
+  const low = Math.min(open, close) - Math.random() * maxChange;
 
   // Update the latest candle for this symbol
   latestCandles[symbol].close = close;
 
   // Return the candle in the expected format
   return [
-    Date.now(),
+    Math.floor(Date.now() / 1000) * 1000,
     parseFloat(open.toFixed(2)),
     parseFloat(Math.max(high).toFixed(2)),
     parseFloat(Math.min(low).toFixed(2)),
-    parseFloat(close.toFixed(2))
+    parseFloat(close.toFixed(2)),
   ];
 }
 
@@ -188,45 +216,45 @@ function getRandomPrice(base) {
 }
 
 // --- HTTP Server handling ---
-server.on('request', (req, res) => {
+server.on("request", (req, res) => {
   const parsedUrl = url.parse(req.url, true);
 
   // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   // Handle preflight requests
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     res.writeHead(204);
     res.end();
     return;
   }
 
   // Handle GET request for initial candles
-  if (req.method === 'GET' && parsedUrl.pathname === '/api/initialCandles') {
-    const requestedSymbols = parsedUrl.query.symbols ?
-      parsedUrl.query.symbols.split(',').filter(s => symbols.includes(s)) :
-      symbols;
+  if (req.method === "GET" && parsedUrl.pathname === "/api/initialCandles") {
+    const requestedSymbols = parsedUrl.query.symbols
+      ? parsedUrl.query.symbols.split(",").filter((s) => symbols.includes(s))
+      : symbols;
 
     const response = {};
 
-    requestedSymbols.forEach(symbol => {
+    requestedSymbols.forEach((symbol) => {
       response[symbol] = getInitialCandles(symbol);
     });
 
-    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify(response));
     return;
   }
 
   // Handle GET request for initial ticker data
-  if (req.method === 'GET' && parsedUrl.pathname === '/api/initialTickers') {
-    const requestedSymbols = parsedUrl.query.symbols ?
-      parsedUrl.query.symbols.split(',').filter(s => symbols.includes(s)) :
-      symbols;
+  if (req.method === "GET" && parsedUrl.pathname === "/api/initialTickers") {
+    const requestedSymbols = parsedUrl.query.symbols
+      ? parsedUrl.query.symbols.split(",").filter((s) => symbols.includes(s))
+      : symbols;
 
-    const response = requestedSymbols.map(symbol => {
+    const response = requestedSymbols.map((symbol) => {
       const basePrice = basePrices[symbol];
       const last = getRandomPrice(basePrice);
       const bid = getRandomPrice(basePrice - 1);
@@ -239,54 +267,54 @@ server.on('request', (req, res) => {
           bid,
           ask,
           change: 0,
-          percentChange: 0
+          percentChange: 0,
         },
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
     });
 
-    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify(response));
     return;
   }
 
   // Handle 404 for all other routes
-  res.writeHead(404, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({ error: 'Not found' }));
+  res.writeHead(404, { "Content-Type": "application/json" });
+  res.end(JSON.stringify({ error: "Not found" }));
 });
 
 // --- WebSocket Server handling ---
 let previousPrices = {};
 
 // Initialize previousPrices with base prices
-symbols.forEach(symbol => {
+symbols.forEach((symbol) => {
   previousPrices[symbol] = basePrices[symbol];
 });
 
-wss.on('connection', (ws) => {
-  ws.subscriptions = {};  // { channel: [symbols] }
-  console.log('Client connected');
+wss.on("connection", (ws) => {
+  ws.subscriptions = {}; // { channel: [symbols] }
+  console.log("Client connected");
 
-  ws.on('message', (msg) => {
+  ws.on("message", (msg) => {
     try {
       const message = JSON.parse(msg);
       const { type, channel, symbols: subSymbols } = message;
 
-      if (type === 'subscribe' && channel && Array.isArray(subSymbols)) {
+      if (type === "subscribe" && channel && Array.isArray(subSymbols)) {
         // Validate symbols
-        const validSymbols = subSymbols.filter(s => symbols.includes(s));
+        const validSymbols = subSymbols.filter((s) => symbols.includes(s));
 
         // Store per channel
         ws.subscriptions[channel] = validSymbols;
         console.log(`Client subscribed to [${channel}]:`, validSymbols);
       }
     } catch (err) {
-      console.error('Invalid message:', err);
+      console.error("Invalid message:", err);
     }
   });
 
-  ws.on('close', () => {
-    console.log('Client disconnected');
+  ws.on("close", () => {
+    console.log("Client disconnected");
   });
 });
 
@@ -295,9 +323,9 @@ setInterval(() => {
   wss.clients.forEach((client) => {
     if (client.readyState !== WebSocket.OPEN) return;
 
-    const subs = client.subscriptions['ticker'];
+    const subs = client.subscriptions["ticker"];
     if (subs && subs.length > 0) {
-      const updates = subs.map(symbol => {
+      const updates = subs.map((symbol) => {
         // For ticker prices, use the close price from the latest candle if available
         // This ensures consistency between candlestick and ticker data
         let last;
@@ -312,7 +340,9 @@ setInterval(() => {
 
         const prevPrice = previousPrices[symbol] || basePrices[symbol];
         const change = +(last - prevPrice).toFixed(2);
-        const percentChange = +(((last - prevPrice) / prevPrice) * 100).toFixed(2);
+        const percentChange = +(((last - prevPrice) / prevPrice) * 100).toFixed(
+          2
+        );
         previousPrices[symbol] = last;
 
         // Slightly vary bid/ask around the last price
@@ -327,13 +357,13 @@ setInterval(() => {
             bid,
             ask,
             change,
-            percentChange
+            percentChange,
           },
-          timestamp: Date.now()
+          timestamp: Date.now(),
         };
       });
 
-      client.send(JSON.stringify({ type: 'ticker', data: updates }));
+      client.send(JSON.stringify({ type: "ticker", data: updates }));
     }
   });
 }, 1000);
@@ -343,14 +373,14 @@ setInterval(() => {
   wss.clients.forEach((client) => {
     if (client.readyState !== WebSocket.OPEN) return;
 
-    const subs = client.subscriptions['candle'];
+    const subs = client.subscriptions["candle"];
     if (subs && subs.length > 0) {
-      const updates = subs.map(symbol => ({
+      const updates = subs.map((symbol) => ({
         symbol,
-        candle: getNextCandle(symbol)
+        candle: getNextCandle(symbol),
       }));
 
-      client.send(JSON.stringify({ type: 'candle', data: updates }));
+      client.send(JSON.stringify({ type: "candle", data: updates }));
     }
   });
 }, 100);
