@@ -72,7 +72,7 @@ export const LiveCandlestickChart = ({
         inputEnabled: false,
       },
       xAxis: {
-        overscroll: "24px",
+        overscroll: "48px",
       },
       series: [
         {
